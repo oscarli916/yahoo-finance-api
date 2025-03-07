@@ -91,11 +91,23 @@ type HistoryQuery struct {
 }
 
 func (hq *HistoryQuery) SetDefault() {
-	if hq.Range == "" {
+	if hq.Range == "" && hq.Start == "" {
 		hq.Range = "1mo"
 	}
 	if hq.Interval == "" {
 		hq.Interval = "1d"
+	}
+	if hq.Start != "" {
+		t, err := time.Parse("2006-01-02", hq.Start)
+		if err != nil {
+			log.Printf("Failed to parse start date: %v\n", err)
+			hq.Start = "default"
+		} else {
+			hq.Start = fmt.Sprintf("%d", t.Unix())
+		}
+	}
+	if hq.End == "" {
+		hq.End = fmt.Sprintf("%d", time.Now().Unix())
 	}
 	if hq.UserAgent == "" {
 		hq.UserAgent = USER_AGENTS[rand.Intn(len(USER_AGENTS))]
@@ -118,8 +130,12 @@ func (h *History) GetHistory(symbol string) map[string]PriceData {
 	h.query.SetDefault()
 
 	params := url.Values{}
-	params.Add("range", h.query.Range)
+	if h.query.Range != "" {
+		params.Add("range", h.query.Range)
+	}
 	params.Add("interval", h.query.Interval)
+	params.Add("period1", h.query.Start)
+	params.Add("period2", h.query.End)
 
 	url := fmt.Sprintf("%s/v8/finance/chart/%s?%s", BASE_URL, symbol, params.Encode())
 	client := &http.Client{}
