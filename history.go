@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -164,9 +165,13 @@ func (h *History) transformData(data YahooHistoryRespose) map[string]PriceData {
 	d := make(map[string]PriceData)
 	for i, result := range data.Chart.Result[0].Timestamp {
 		t := time.Unix(result, 0)
-		date := t.Format("2006-01-02 15:04:05")
-		fmt.Println(date, result, i)
-		d[date] = PriceData{
+		var key string
+		if strings.HasSuffix(h.query.Interval, "d") || strings.HasSuffix(h.query.Interval, "wk") || strings.HasSuffix(h.query.Interval, "mo") {
+			key = t.Format("2006-01-02")
+		} else {
+			key = t.Format("2006-01-02 15:04:05")
+		}
+		d[key] = PriceData{
 			Open:   data.Chart.Result[0].Indicators.Quote[0].Open[i],
 			High:   data.Chart.Result[0].Indicators.Quote[0].High[i],
 			Low:    data.Chart.Result[0].Indicators.Quote[0].Low[i],
