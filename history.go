@@ -16,10 +16,10 @@ type YahooHistoryRespose struct {
 }
 
 type YahooChart struct {
-	Result []YahooResult `json:"result"`
+	Result []YahooHistoryResult `json:"result"`
 }
 
-type YahooResult struct {
+type YahooHistoryResult struct {
 	Meta       YahooMeta      `json:"meta"`
 	Timestamp  []int64        `json:"timestamp"`
 	Indicators YahooIndicator `json:"indicators"`
