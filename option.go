@@ -173,12 +173,12 @@ func NewOption() *Option {
 	return &Option{client: GetClient()}
 }
 
-func (o *Option) GetOptionChain(symbol string) OptionData {
+func (o *Option) GetOptionChain(symbol string) YahooOptionResponse {
 	endpoint := fmt.Sprintf("%s/v7/finance/options/%s", BASE_URL, symbol)
 	resp, err := o.client.Get(endpoint, url.Values{})
 	if err != nil {
 		slog.Error("Failed to get option chain", "err", err)
-		return OptionData{}
+		return YahooOptionResponse{}
 	}
 	defer resp.Body.Close()
 
@@ -187,7 +187,31 @@ func (o *Option) GetOptionChain(symbol string) OptionData {
 		slog.Error("Failed to decode option data JSON response", "err", err)
 	}
 
-	return o.transformData(optionResponse)
+	return optionResponse
+}
+
+func (o *Option) GetOptionChainByExpiration(symbol string, expirationDate string) YahooOptionResponse {
+	t, err := time.Parse("2006-01-02", expirationDate)
+	if err != nil {
+		slog.Error("Failed to parse expiration date", "err", err)
+		return YahooOptionResponse{}
+	}
+	endpoint := fmt.Sprintf("%s/v7/finance/options/%s", BASE_URL, symbol)
+	params := url.Values{}
+	params.Add("date", fmt.Sprintf("%d", t.Unix()))
+	resp, err := o.client.Get(endpoint, params)
+	if err != nil {
+		slog.Error("Failed to get option chain by expiration", "err", err)
+		return YahooOptionResponse{}
+	}
+	defer resp.Body.Close()
+
+	var optionResponse YahooOptionResponse
+	if err := json.NewDecoder(resp.Body).Decode(&optionResponse); err != nil {
+		slog.Error("Failed to decode option data JSON response", "err", err)
+	}
+
+	return optionResponse
 }
 
 func (o *Option) transformData(data YahooOptionResponse) OptionData {
@@ -238,4 +262,13 @@ func (o *Option) transformData(data YahooOptionResponse) OptionData {
 		Calls:          calls,
 		Puts:           puts,
 	}
+}
+
+func (o *Option) GetExpirationDates(symbol string) []string {
+	optionChain := o.GetOptionChain(symbol)
+	var expirationDates []string
+	for _, date := range optionChain.OptionChain.Result[0].ExpirationDates {
+		expirationDates = append(expirationDates, time.Unix(date, 0).Format("2006-01-02"))
+	}
+	return expirationDates
 }

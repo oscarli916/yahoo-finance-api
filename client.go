@@ -71,7 +71,6 @@ func (c *Client) getCookie() {
 }
 
 func (c *Client) getCrumb() {
-	slog.Info("crumb", "crumb", c.crumb)
 	if c.crumb != "" {
 		return
 	}

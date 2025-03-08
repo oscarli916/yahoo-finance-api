@@ -14,11 +14,21 @@ func NewTicker(symbol string) *Ticker {
 
 func (t *Ticker) History(query HistoryQuery) map[string]PriceData {
 	t.history.SetQuery(query)
-	data := t.history.GetHistory(t.Symbol)
-	return data
+	history := t.history.GetHistory(t.Symbol)
+	return t.history.transformData(history)
 }
 
 func (t *Ticker) OptionChain() OptionData {
-	data := t.option.GetOptionChain(t.Symbol)
-	return data
+	optionChain := t.option.GetOptionChain(t.Symbol)
+	return t.option.transformData(optionChain)
+}
+
+func (t *Ticker) OptionChainByExpiration(expiration string) OptionData {
+	optionChain := t.option.GetOptionChainByExpiration(t.Symbol, expiration)
+	return t.option.transformData(optionChain)
+}
+
+func (t *Ticker) ExpirationDates() []string {
+	expirationDates := t.option.GetExpirationDates(t.Symbol)
+	return expirationDates
 }

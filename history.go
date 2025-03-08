@@ -128,7 +128,7 @@ func (h *History) SetQuery(query HistoryQuery) {
 	h.query = &query
 }
 
-func (h *History) GetHistory(symbol string) map[string]PriceData {
+func (h *History) GetHistory(symbol string) YahooHistoryRespose {
 	h.query.SetDefault()
 
 	params := url.Values{}
@@ -143,7 +143,7 @@ func (h *History) GetHistory(symbol string) map[string]PriceData {
 	resp, err := h.client.Get(endpoint, params)
 	if err != nil {
 		slog.Error("Failed to get history", "err", err)
-		return nil
+		return YahooHistoryRespose{}
 	}
 	defer resp.Body.Close()
 
@@ -152,7 +152,7 @@ func (h *History) GetHistory(symbol string) map[string]PriceData {
 		log.Fatalf("Failed to decode history data JSON response: %v", err)
 	}
 
-	return h.transformData(historyResponse)
+	return historyResponse
 }
 
 func (h *History) transformData(data YahooHistoryRespose) map[string]PriceData {
