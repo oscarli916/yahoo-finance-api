@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"log/slog"
 	"math/rand"
-	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -116,11 +116,12 @@ func (hq *HistoryQuery) SetDefault() {
 }
 
 type History struct {
-	query *HistoryQuery
+	query  *HistoryQuery
+	client *Client
 }
 
 func NewHistory() *History {
-	return &History{query: &HistoryQuery{}}
+	return &History{query: &HistoryQuery{}, client: GetClient()}
 }
 
 func (h *History) SetQuery(query HistoryQuery) {
@@ -138,18 +139,11 @@ func (h *History) GetHistory(symbol string) map[string]PriceData {
 	params.Add("period1", h.query.Start)
 	params.Add("period2", h.query.End)
 
-	url := fmt.Sprintf("%s/v8/finance/chart/%s?%s", BASE_URL, symbol, params.Encode())
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
+	endpoint := fmt.Sprintf("%s/v8/finance/chart/%s", BASE_URL, symbol)
+	resp, err := h.client.Get(endpoint, params)
 	if err != nil {
-		log.Fatalf("Failed to create request: %v", err)
-	}
-
-	req.Header.Set("User-Agent", h.query.UserAgent)
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatalf("Failed to get history data from Yahoo Finance API: %v", err)
+		slog.Error("Failed to get history", "err", err)
+		return nil
 	}
 	defer resp.Body.Close()
 
