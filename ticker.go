@@ -12,10 +12,13 @@ func NewTicker(symbol string) *Ticker {
 	return &Ticker{Symbol: symbol, history: h, option: o}
 }
 
-func (t *Ticker) History(query HistoryQuery) map[string]PriceData {
+func (t *Ticker) History(query HistoryQuery) (map[string]PriceData, error) {
 	t.history.SetQuery(query)
-	history := t.history.GetHistory(t.Symbol)
-	return t.history.transformData(history)
+	history, err := t.history.GetHistory(t.Symbol)
+	if err != nil {
+		return nil, err
+	}
+	return t.history.transformData(history), nil
 }
 
 func (t *Ticker) OptionChain() OptionData {
