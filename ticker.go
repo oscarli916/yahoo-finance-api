@@ -1,6 +1,8 @@
 package yahoofinanceapi
 
-import "sort"
+import (
+	"sort"
+)
 
 type Ticker struct {
 	Symbol  string
@@ -14,7 +16,11 @@ func NewTicker(symbol string) *Ticker {
 	return &Ticker{Symbol: symbol, history: h, option: o}
 }
 
-// get the latest Quote from the History, fetches new history in the process
+// Quote returns the latest PriceData for the Ticker's symbol.
+//
+// This is a convenience wrapper around the History function. It fetches the historical
+// price data for the symbol, sorts the dates, and returns the most recent entry.
+// If you need more control or access to the full historical data, use the History method directly.
 func (t *Ticker) Quote() (PriceData, error) {
 	history, err := t.history.GetHistory(t.Symbol)
 	if err != nil {

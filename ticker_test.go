@@ -1,20 +1,83 @@
 package yahoofinanceapi
 
 import (
-	"fmt"
 	"testing"
 )
 
 func TestNewTicker(t *testing.T) {
 	ticker := NewTicker("AAPL")
-
+	if ticker == nil {
+		t.Fatal("NewTicker returned nil")
+	}
 	if ticker.Symbol != "AAPL" {
-		panic("Something went wrong creating a ticker")
+		t.Errorf("Expected symbol 'AAPL', got '%s'", ticker.Symbol)
 	}
 }
 
-func TestGetQuote(t *testing.T) {
+func TestQuoteValidSymbol(t *testing.T) {
 	ticker := NewTicker("AAPL")
-	quote, _ := ticker.Quote()
-	fmt.Println(quote.Close)
+	quote, err := ticker.Quote()
+	if err != nil {
+		t.Fatalf("Quote returned error: %v", err)
+	}
+	if quote.Close == 0 {
+		t.Error("Quote returned PriceData with zero Close")
+	}
+}
+
+func TestQuoteInvalidSymbol(t *testing.T) {
+	ticker := NewTicker("INVALID_SYMBOL_123")
+	_, err := ticker.Quote()
+	if err == nil {
+		t.Error("Expected error for invalid symbol, got nil")
+	}
+}
+
+func TestHistoryValidSymbol(t *testing.T) {
+	ticker := NewTicker("AAPL")
+	query := HistoryQuery{Range: "1mo", Interval: "1d"}
+	data, err := ticker.History(query)
+	if err != nil {
+		t.Fatalf("History returned error: %v", err)
+	}
+	if len(data) == 0 {
+		t.Error("History returned empty map for valid symbol")
+	}
+}
+
+func TestHistoryInvalidSymbol(t *testing.T) {
+	ticker := NewTicker("INVALID_SYMBOL_123")
+	query := HistoryQuery{Range: "1mo", Interval: "1d"}
+	_, err := ticker.History(query)
+	if err == nil {
+		t.Error("Expected error for invalid symbol, got nil")
+	}
+}
+
+func TestOptionChain(t *testing.T) {
+	ticker := NewTicker("AAPL")
+	data := ticker.OptionChain()
+	if len(data.Calls) == 0 && len(data.Puts) == 0 {
+		t.Error("OptionChain returned empty calls and puts")
+	}
+}
+
+func TestOptionChainByExpiration(t *testing.T) {
+	ticker := NewTicker("AAPL")
+	dates := ticker.ExpirationDates()
+	if len(dates) == 0 {
+		t.Skip("No expiration dates available for AAPL")
+	}
+	data := ticker.OptionChainByExpiration(dates[0])
+	if len(data.Calls) == 0 && len(data.Puts) == 0 {
+		t.Error("OptionChainByExpiration returned empty calls and puts")
+	}
+}
+
+func TestExpirationDates(t *testing.T) {
+	ticker := NewTicker("AAPL")
+	dates := ticker.ExpirationDates()
+	if len(dates) == 0 {
+		t.Error("ExpirationDates returned empty slice")
+	}
 }
