@@ -169,8 +169,8 @@ type Option struct {
 	client *Client
 }
 
-func NewOption() *Option {
-	return &Option{client: GetClient()}
+func newOption() *Option {
+	return &Option{client: getClient()}
 }
 
 func (o *Option) GetOptionChain(symbol string) YahooOptionResponse {

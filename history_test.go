@@ -6,14 +6,14 @@ import (
 )
 
 func TestNewHistory(t *testing.T) {
-	history := NewHistory()
+	history := newHistory()
 	if history == nil {
-		t.Fatal("NewHistory returned nil")
+		t.Fatal("newHistory returned nil")
 	}
 }
 
 func TestGetHistoryValidSymbol(t *testing.T) {
-	history := NewHistory()
+	history := newHistory()
 	resp, err := history.GetHistory("AAPL")
 	if err != nil {
 		t.Fatalf("GetHistory returned error: %v", err)
@@ -24,7 +24,7 @@ func TestGetHistoryValidSymbol(t *testing.T) {
 }
 
 func TestGetHistoryInvalidSymbol(t *testing.T) {
-	history := NewHistory()
+	history := newHistory()
 	_, err := history.GetHistory("INVALID_SYMBOL_123")
 	if err == nil {
 		t.Error("Expected error for invalid symbol, got nil")
@@ -32,7 +32,7 @@ func TestGetHistoryInvalidSymbol(t *testing.T) {
 }
 
 func TestTransformData(t *testing.T) {
-	history := NewHistory()
+	history := newHistory()
 	resp, err := history.GetHistory("AAPL")
 	if err != nil {
 		t.Fatalf("GetHistory returned error: %v", err)
@@ -49,7 +49,7 @@ func TestTransformData(t *testing.T) {
 }
 
 func TestTransformDataWithMinuteInterval(t *testing.T) {
-	history := NewHistory()
+	history := newHistory()
 	q := HistoryQuery{Range: "1d", Interval: "1m"}
 	history.SetQuery(q)
 	resp, err := history.GetHistory("AAPL")
@@ -68,7 +68,7 @@ func TestTransformDataWithMinuteInterval(t *testing.T) {
 }
 
 func TestSetQuery(t *testing.T) {
-	history := NewHistory()
+	history := newHistory()
 	q := HistoryQuery{Range: "5d", Interval: "1d"}
 	history.SetQuery(q)
 	if history.query.Range != "5d" || history.query.Interval != "1d" {

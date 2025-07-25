@@ -11,8 +11,8 @@ type Ticker struct {
 }
 
 func NewTicker(symbol string) *Ticker {
-	h := NewHistory()
-	o := NewOption()
+	h := newHistory()
+	o := newOption()
 	return &Ticker{Symbol: symbol, history: h, option: o}
 }
 

@@ -120,8 +120,8 @@ type History struct {
 	client *Client
 }
 
-func NewHistory() *History {
-	return &History{query: &HistoryQuery{}, client: GetClient()}
+func newHistory() *History {
+	return &History{query: &HistoryQuery{}, client: getClient()}
 }
 
 func (h *History) SetQuery(query HistoryQuery) {

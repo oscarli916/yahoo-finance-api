@@ -19,7 +19,7 @@ type Client struct {
 var instance *Client
 var once sync.Once
 
-func GetClient() *Client {
+func getClient() *Client {
 	once.Do(func() {
 		instance = &Client{client: &http.Client{}, cookies: []*http.Cookie{}, crumb: ""}
 	})
