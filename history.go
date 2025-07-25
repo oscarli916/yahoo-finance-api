@@ -128,6 +128,8 @@ func (h *History) SetQuery(query HistoryQuery) {
 	h.query = &query
 }
 
+// returns the price/volume history of the given symbol as a YahooHistoryResponse
+// If you want to adjust the query range change h.query.Range = "6mo" for 6 month
 func (h *History) GetHistory(symbol string) (YahooHistoryRespose, error) {
 	h.query.SetDefault()
 
@@ -174,8 +176,8 @@ func (h *History) transformData(data YahooHistoryRespose) map[string]PriceData {
 			High:   data.Chart.Result[0].Indicators.Quote[0].High[i],
 			Low:    data.Chart.Result[0].Indicators.Quote[0].Low[i],
 			Close:  data.Chart.Result[0].Indicators.Quote[0].Close[i],
-			Volume: data.Chart.Result[0].Indicators.Quote[0].Volume[i]}
+			Volume: data.Chart.Result[0].Indicators.Quote[0].Volume[i],
+		}
 	}
-
 	return d
 }

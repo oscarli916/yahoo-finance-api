@@ -1,5 +1,7 @@
 package yahoofinanceapi
 
+import "sort"
+
 type Ticker struct {
 	Symbol  string
 	history *History
@@ -10,6 +12,25 @@ func NewTicker(symbol string) *Ticker {
 	h := NewHistory()
 	o := NewOption()
 	return &Ticker{Symbol: symbol, history: h, option: o}
+}
+
+// get the latest Quote from the History, fetches new history in the process
+func (t *Ticker) Quote() (PriceData, error) {
+	history, err := t.history.GetHistory(t.Symbol)
+	if err != nil {
+		return PriceData{}, err
+	}
+	transformedData := t.history.transformData(history)
+
+	dates := make([]string, 0, len(transformedData))
+	for date := range transformedData {
+		dates = append(dates, date)
+	}
+	sort.Strings(dates)
+
+	latestDate := dates[len(dates)-1]
+	latestPriceData := transformedData[latestDate]
+	return latestPriceData, nil
 }
 
 func (t *Ticker) History(query HistoryQuery) (map[string]PriceData, error) {
