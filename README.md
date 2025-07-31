@@ -15,7 +15,7 @@ go get github.com/oscarli916/yahoo-finance-api
 
 ## Example
 
-```
+```go
 package main
 
 import (
@@ -47,6 +47,13 @@ func main() {
 	e := t.ExpirationDates()
 	oc := t.OptionChainByExpiration(e[2])
 	fmt.Println(oc)
+	
+	// Ticker Information
+	info, err := t.GetInfo()
+	if err != nil {
+		fmt.Println("GetInfo returned error:", err)
+	}
+	fmt.Println(info)
 }
 
 ```
