@@ -18,18 +18,58 @@ type YahooInfoResponse struct {
 	} `json:"quoteSummary"`
 }
 
+// PriceValue represents a price value with raw and formatted representations
+type PriceValue struct {
+	Raw     float64 `json:"raw"`
+	Fmt     string  `json:"fmt"`
+	LongFmt string  `json:"longFmt,omitempty"`
+}
+
 // YahooTickerInfo --> Struct to hold key metadata about the ticker
 type YahooTickerInfo struct {
-	Symbol             string `json:"symbol"`
-	ShortName          string `json:"shortName"`
-	LongName           string `json:"longName"`
-	Currency           string `json:"currency"`
-	ExchangeName       string `json:"exchangeName"`
-	MarketState        string `json:"marketState"`
-	RegularMarketPrice struct {
-		Raw float64 `json:"raw"`
-		Fmt string  `json:"fmt"`
-	} `json:"regularMarketPrice"`
+	MaxAge                     int         `json:"maxAge"`
+	PreMarketChange            *PriceValue `json:"preMarketChange"`
+	PreMarketPrice             *PriceValue `json:"preMarketPrice"`
+	PreMarketSource            string      `json:"preMarketSource"`
+	PostMarketChangePercent    *PriceValue `json:"postMarketChangePercent"`
+	PostMarketChange           *PriceValue `json:"postMarketChange"`
+	PostMarketTime             int64       `json:"postMarketTime"`
+	PostMarketPrice            *PriceValue `json:"postMarketPrice"`
+	PostMarketSource           string      `json:"postMarketSource"`
+	RegularMarketChangePercent *PriceValue `json:"regularMarketChangePercent"`
+	RegularMarketChange        *PriceValue `json:"regularMarketChange"`
+	RegularMarketTime          int64       `json:"regularMarketTime"`
+	PriceHint                  *PriceValue `json:"priceHint"`
+	RegularMarketPrice         *PriceValue `json:"regularMarketPrice"`
+	RegularMarketDayHigh       *PriceValue `json:"regularMarketDayHigh"`
+	RegularMarketDayLow        *PriceValue `json:"regularMarketDayLow"`
+	RegularMarketVolume        *PriceValue `json:"regularMarketVolume"`
+	AverageDailyVolume10Day    *PriceValue `json:"averageDailyVolume10Day"`
+	AverageDailyVolume3Month   *PriceValue `json:"averageDailyVolume3Month"`
+	RegularMarketPreviousClose *PriceValue `json:"regularMarketPreviousClose"`
+	RegularMarketSource        string      `json:"regularMarketSource"`
+	RegularMarketOpen          *PriceValue `json:"regularMarketOpen"`
+	StrikePrice                *PriceValue `json:"strikePrice"`
+	OpenInterest               *PriceValue `json:"openInterest"`
+	Exchange                   string      `json:"exchange"`
+	ExchangeName               string      `json:"exchangeName"`
+	ExchangeDataDelayedBy      int         `json:"exchangeDataDelayedBy"`
+	MarketState                string      `json:"marketState"`
+	QuoteType                  string      `json:"quoteType"`
+	Symbol                     string      `json:"symbol"`
+	UnderlyingSymbol           *string     `json:"underlyingSymbol"`
+	ShortName                  string      `json:"shortName"`
+	LongName                   string      `json:"longName"`
+	Currency                   string      `json:"currency"`
+	QuoteSourceName            string      `json:"quoteSourceName"`
+	CurrencySymbol             string      `json:"currencySymbol"`
+	FromCurrency               *string     `json:"fromCurrency"`
+	ToCurrency                 *string     `json:"toCurrency"`
+	LastMarket                 *string     `json:"lastMarket"`
+	Volume24Hr                 *PriceValue `json:"volume24Hr"`
+	VolumeAllCurrencies        *PriceValue `json:"volumeAllCurrencies"`
+	CirculatingSupply          *PriceValue `json:"circulatingSupply"`
+	MarketCap                  *PriceValue `json:"marketCap"`
 }
 
 // Information holds the HTTP client
@@ -42,8 +82,8 @@ func newInformation() *Information {
 	return &Information{client: getClient()}
 }
 
-// GetTickerInfo fetches metadata information for a given ticker
-func (i *Information) GetTickerInfo(symbol string) (YahooTickerInfo, error) {
+// GetInfo fetches metadata information for a given ticker
+func (i *Information) GetInfo(symbol string) (YahooTickerInfo, error) {
 	// Prepare URL parameters to request the "price" module
 	params := url.Values{}
 	params.Add("modules", "price")

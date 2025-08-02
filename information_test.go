@@ -14,7 +14,7 @@ func TestNewInformation(t *testing.T) {
 
 func TestGetTickerInfoValidSymbol(t *testing.T) {
 	info := newInformation()
-	data, err := info.GetTickerInfo("AAPL")
+	data, err := info.GetInfo("AAPL")
 	log.Println(data, err)
 	if err != nil {
 		t.Fatalf("GetTickerInfo returned error: %v", err)
@@ -22,17 +22,17 @@ func TestGetTickerInfoValidSymbol(t *testing.T) {
 	if data.Symbol != "AAPL" {
 		t.Errorf("Expected symbol 'AAPL', got '%s'", data.Symbol)
 	}
-	if data.ShortName == "" {
-		t.Error("Expected non-empty ShortName")
+	if data.ShortName != "Apple Inc." {
+		t.Errorf("Expected ShortName 'Apple Inc.', got '%s'", data.ShortName)
 	}
-	if data.Currency == "" {
-		t.Error("Expected non-empty Currency")
+	if data.Currency != "USD" {
+		t.Errorf("Expected Currency 'USD', got '%s'", data.Currency)
 	}
 }
 
 func TestGetTickerInfoInvalidSymbol(t *testing.T) {
 	info := newInformation()
-	_, err := info.GetTickerInfo("INVALID_SYMBOL_123")
+	_, err := info.GetInfo("INVALID_SYMBOL_123")
 	if err == nil {
 		t.Error("Expected error for invalid symbol, got nil")
 	}

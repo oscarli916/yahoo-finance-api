@@ -44,17 +44,17 @@ func (t *Ticker) Quote() (PriceData, error) {
 	return latestPriceData, nil
 }
 
-// GetInfo retrieves the ticker information for the Ticker's symbol.
+// Info retrieves the ticker information for the Ticker's symbol.
 // It returns a YahooTickerInfo struct containing metadata such as the symbol, name, currency, and market state.
 // If no information is found, it returns an error.
-func (t *Ticker) GetInfo() (YahooTickerInfo, error) {
-	info, err := t.information.GetTickerInfo(t.Symbol)
+func (t *Ticker) Info() (YahooTickerInfo, error) {
+	info, err := t.information.GetInfo(t.Symbol)
 	if err != nil {
 		return YahooTickerInfo{}, err
 	}
 
-	if info.Symbol == "" {
-		return YahooTickerInfo{}, fmt.Errorf("no information found for symbol: %s", t.Symbol)
+	if info.Symbol != t.Symbol {
+		return YahooTickerInfo{}, fmt.Errorf("symbol mismatch: expected %s, got %s", t.Symbol, info.Symbol)
 	}
 	return info, nil
 }
