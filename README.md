@@ -7,6 +7,8 @@
 - Learn Go
 - Able to use this package on my other Go projects
 
+If you love this project, please consider giving it a ⭐.
+
 ## Installation
 
 ```
