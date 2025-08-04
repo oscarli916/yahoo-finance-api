@@ -33,6 +33,31 @@ func TestQuoteInvalidSymbol(t *testing.T) {
 	}
 }
 
+func TestGetInfoValidSymbol(t *testing.T) {
+	ticker := NewTicker("AAPL")
+	info, err := ticker.Info()
+	if err != nil {
+		t.Fatalf("GetInfo returned error: %v", err)
+	}
+	if info.Symbol != "AAPL" {
+		t.Errorf("Expected symbol 'AAPL', got '%s'", info.Symbol)
+	}
+	if info.ShortName != "Apple Inc." {
+		t.Errorf("Expected ShortName 'Apple Inc.', got '%s'", info.ShortName)
+	}
+	if info.Currency != "USD" {
+		t.Errorf("Expected Currency 'USD', got '%s'", info.Currency)
+	}
+}
+
+func TestGetInfoInvalidSymbol(t *testing.T) {
+	ticker := NewTicker("INVALID_SYMBOL_123")
+	_, err := ticker.Info()
+	if err == nil {
+		t.Error("Expected error for invalid symbol, got nil")
+	}
+}
+
 func TestHistoryValidSymbol(t *testing.T) {
 	ticker := NewTicker("AAPL")
 	query := HistoryQuery{Range: "1mo", Interval: "1d"}
