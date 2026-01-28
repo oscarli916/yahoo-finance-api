@@ -49,13 +49,22 @@ func main() {
 	e := t.ExpirationDates()
 	oc := t.OptionChainByExpiration(e[2])
 	fmt.Println(oc)
-	
+
 	// Ticker Information
 	info, err := t.GetInfo()
 	if err != nil {
 		fmt.Println("GetInfo returned error:", err)
 	}
 	fmt.Println(info)
+
+	// Search for symbols
+	results, err := t.Search("AAPL", 10)
+	if err != nil {
+		fmt.Println("Search returned error:", err)
+	}
+	for _, r := range results {
+		fmt.Printf("%s - %s (%s)\n", r.Symbol, r.Name, r.Type)
+	}
 }
 
 ```
