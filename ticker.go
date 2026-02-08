@@ -10,6 +10,7 @@ type Ticker struct {
 	history     *History
 	option      *Option
 	information *Information
+	search      *Search
 }
 
 // NewTicker creates a new Ticker instance for the given symbol.
@@ -19,7 +20,8 @@ func NewTicker(symbol string) *Ticker {
 	h := newHistory()
 	o := newOption()
 	i := newInformation()
-	return &Ticker{Symbol: symbol, history: h, option: o, information: i}
+	s := newSearch()
+	return &Ticker{Symbol: symbol, history: h, option: o, information: i, search: s}
 }
 
 // Quote returns the latest PriceData for the Ticker's symbol.
@@ -92,4 +94,40 @@ func (t *Ticker) OptionChainByExpiration(expiration string) OptionData {
 func (t *Ticker) ExpirationDates() []string {
 	expirationDates := t.option.GetExpirationDates(t.Symbol)
 	return expirationDates
+}
+
+// Search searches for investment symbols by query using Yahoo Finance's public search API.
+// This is a convenience function that uses default search parameters.
+//
+// Parameters:
+//   - query: Search query (symbol, company name, etc.)
+//   - limit: Maximum number of results to return (max 20, default 10)
+//
+// Returns:
+//   - []SearchResult: List of search results
+//   - error: Error if request fails or query is invalid
+func (t *Ticker) Search(query string, limit int) ([]SearchResult, error) {
+	searchResponse, err := t.search.GetSearchResults(query, limit)
+	if err != nil {
+		return nil, err
+	}
+	data := t.search.transformData(searchResponse)
+	return data.Results, nil
+}
+
+// SearchWithOptions searches for investment symbols using custom parameters.
+//
+// Parameters:
+//   - params: SearchParams with custom configuration
+//
+// Returns:
+//   - []SearchResult: List of search results
+//   - error: Error if request fails or query is invalid
+func (t *Ticker) SearchWithOptions(params SearchParams) ([]SearchResult, error) {
+	searchResponse, err := t.search.GetSearchResultsWithOptions(params)
+	if err != nil {
+		return nil, err
+	}
+	data := t.search.transformData(searchResponse)
+	return data.Results, nil
 }
